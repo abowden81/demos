@@ -1,5 +1,5 @@
 gunicorn
-django==2.9
+django==2.2.27
 django-filter
 djangorestframework
 django-cors-headers
