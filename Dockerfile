@@ -1,5 +1,5 @@
 # Use an official Python runtime as a base image
-FROM python:3.7.13-buster
+FROM python:3.6.0b4-alpine
 
 # set file maintainer
 LABEL org.opencontainers.image.authors="Aaron Bowden"
