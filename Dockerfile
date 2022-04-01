@@ -2,7 +2,7 @@
 FROM python:latest
 
 # set file maintainer
-Author Aaron Bowden
+AUTHOR Aaron Bowden
 
 # Set the working directory to /autocomplete
 WORKDIR /autocomplete
