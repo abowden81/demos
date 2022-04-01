@@ -2,7 +2,7 @@
 FROM python:latest
 
 # set file maintainer
-AUTHOR Aaron Bowden
+LABEL org.opencontainers.image.authors="Aaron Bowden"
 
 # Set the working directory to /autocomplete
 WORKDIR /autocomplete
