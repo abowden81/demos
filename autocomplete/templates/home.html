@@ -1,0 +1,147 @@
+{% load staticfiles %}
+<html lang="en" >
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Angular Material style sheet -->
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+<link rel="stylesheet" type="text/css" href="{%static "/css/autocomplete.css" %}">
+<!-- Angular Material requires Angular.js Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+<!-- Angular Material Library -->
+<script src="{% static "/js/angular-resource.min.js" %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+<!-- Your application bootstrap  -->
+<script type="text/javascript">
+
+  /**
+   * You must include the dependency on 'ngMaterial'
+   */
+  //angular.module('BlankApp', ['ngMaterial']);
+
+  var app = angular.module('searchApp', ['ngMaterial']);
+
+  //Factory setup. Promise structure.
+  app.factory('AutocompleteSearchService', ['$http', function ($http) {
+    return {
+      get: function (text) {
+        return ($http.get("api/product/name?search=" + text));
+      }
+    };
+  }]);
+
+  //map controller to HTTP promise
+  app.controller('autoCompleteController', ['$scope','$http', '$timeout', '$q', 'AutocompleteSearchService',function ($scope, $http, $timeout, $q, AutocompleteSearchService) {
+  
+  //build query object
+  var self = this;
+  self.states        = [];
+  self.selectedItem  = null;
+  self.searchText    = null;
+  self.querySearch   = querySearch;
+  self.simulateQuery = false;
+  self.isDisabled    = false;
+  self.displaySearchedResult = displaySearchedResult;
+  self.displayResult = false;
+  self.result = {};
+
+   function querySearch (query) {
+        loadAll(query);
+        //console.log(self.states);
+        var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
+          deferred;
+        return results;
+      
+  }
+
+  function loadAll(query) {
+    AutocompleteSearchService.get(query).success(function(data) {
+      var loadItems = [];
+      var lineItem = [];
+      for (var i in data) {
+        lineItem.push(data[i].name);
+      }
+           
+     loadItems = lineItem.map(function(obj){
+        return {
+          value: obj.toLowerCase(),
+          display: obj
+        };
+      }); 
+      self.states = loadItems;
+      console.log("LineItem ",lineItem)
+      console.log("loadItems ",loadItems)
+      console.log("data ",data)
+    });
+  }
+  //Log output for debug
+  console.log(self.states);
+
+  //Format query for backend
+  function createFilterFor(query) {
+    var lowercaseQuery = angular.lowercase(query);
+    return function filterFn(state) {
+      return (state.value.indexOf(lowercaseQuery) > -1);
+    };
+  }
+
+  function displaySearchedResult(selectedItem) {
+       self.displayResult = true;
+       self.result = selectedItem;
+  }
+
+  }]);
+
+
+
+
+</script>
+</head>
+<body ng-app="searchApp" ng-cloak>
+  {% verbatim %}
+
+  <md-toolbar class="md-warn">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex">Bowden Ltd Product Portal</h2>
+    </div>
+  </md-toolbar>
+  <div ng-controller="autoCompleteController as ctrl" layout="column" ng-cloak>
+    <md-content class="md-padding">
+      <form ng-submit="$event.preventDefault()">
+        <p>Product search prototype</p>
+        <md-autocomplete
+          ng-disabled="ctrl.isDisabled"
+          md-no-cache="ctrl.noCache"
+          md-selected-item="ctrl.selectedItem"
+          md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+          md-search-text="ctrl.searchText"
+          md-selected-item-change="ctrl.displaySearchedResult(item)"
+          md-items="item in ctrl.querySearch(ctrl.searchText)"
+          md-item-text="item.display"
+          md-min-length="2"
+          placeholder="Search">
+        <md-item-template>
+          <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+        </md-item-template>
+      </md-autocomplete>
+        <br/>
+      </form>
+      <md-card  ng-if="ctrl.displayResult">
+      <img ng-src="{{ ctrl.result.image }}" class="md-card-image" alt="{{ctrl.result.display}}" >
+      <md-card-content>
+        <h2>{{ctrl.result.display}}</h2>
+        <p>Card content</p>
+      </md-card-content>
+      <md-card-footer>
+        Card footer
+      </md-card-footer>
+      </md-card>
+    </md-content>
+  </div>
+
+
+  {% endverbatim %}
+</body>
+</html>

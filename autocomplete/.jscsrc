@@ -1,0 +1,11 @@
+{
+  "preset": "airbnb",
+  "disallowMultipleLineBreaks": false,
+  "validateLineBreaks": null,
+  "requireShorthandArrowFunctions": false,
+  "maximumLineLength" : 200,
+  "requirePaddingNewLinesAfterBlocks" : false,
+  "requireSpacesInsideObjectBrackets" : false,
+  "disallowSpaceAfterObjectKeys": false,
+  "requireTrailingComma" : false
+}
